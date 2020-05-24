@@ -76,25 +76,22 @@ function consulta_registro_bd($query)
 	}
 }
 
-function criar_banco_de_dados()
-{
-	return $bd =
-	//Cria bd
-	'CREATE SCHEMA `crud_php_puro` DEFAULT CHARACTER SET utf8 ; '.
-	//cria tabela clientes
-	'CREATE TABLE `crud_php_puro`.`cliente` (
-	  `id_cliente` INT NOT NULL AUTO_INCREMENT,
-	  `nome` VARCHAR(200) NULL,
-	  `cpf` VARCHAR(25) NULL,
-	  `email` VARCHAR(150) NULL,
-	  PRIMARY KEY (`id_cliente`))
-	ENGINE = InnoDB
-	DEFAULT CHARACTER SET = utf8; '.
 
-	"INSERT INTO `crud_php_puro`.`cliente` (`nome`, `cpf`, `email`) VALUES ('teste', '123456789', 'mail@mail.com'); ";
-	"INSERT INTO `crud_php_puro`.`cliente` (`nome`, `cpf`, `email`) VALUES ('teste 2', '123456789', 'mail2@mail.com'); ";
-	"INSERT INTO `crud_php_puro`.`cliente` (`nome`, `cpf`, `email`) VALUES ('teste 3', '123456789', 'mail3@mail.com'); ";
-	"INSERT INTO `crud_php_puro`.`cliente` (`nome`, `cpf`, `email`) VALUES ('teste 4', '123456789', 'mail4@mail.com'); ";
+/* Cria bd
 
+CREATE SCHEMA `crud_php_puro` DEFAULT CHARACTER SET utf8 ;
+CREATE TABLE `crud_php_puro`.`cliente` (
+  `id_cliente` INT NOT NULL AUTO_INCREMENT,
+  `nome` VARCHAR(200) NULL,
+  `cpf` VARCHAR(25) NULL,
+  `email` VARCHAR(150) NULL,
+  PRIMARY KEY (`id_cliente`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
-}
+INSERT INTO `crud_php_puro`.`cliente` (`nome`, `cpf`, `email`) VALUES ('teste', '123456789', 'mail@mail.com');
+INSERT INTO `crud_php_puro`.`cliente` (`nome`, `cpf`, `email`) VALUES ('teste 2', '123456789', 'mail2@mail.com');
+INSERT INTO `crud_php_puro`.`cliente` (`nome`, `cpf`, `email`) VALUES ('teste 3', '123456789', 'mail3@mail.com');
+INSERT INTO `crud_php_puro`.`cliente` (`nome`, `cpf`, `email`) VALUES ('teste 4', '123456789', 'mail4@mail.com');
+
+*/

@@ -1,6 +1,15 @@
 <?php
 	require_once('./conexao.php');
 
+	$operacao = isset($_GET["op"]) ? $_GET["op"] : "";
+	$id = isset($_GET["id"]) ? $_GET["id"] : "";
+
+	if ($operacao == "excluir" && !empty($id)) {
+		$deletar_sql = "DELETE FROM cliente WHERE id_cliente='$id';
+";
+		$deletar = atualiza_bd($deletar_sql);
+	}
+
 ?>
 <!doctype html>
 <html lang="en">
