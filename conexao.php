@@ -34,7 +34,42 @@ function consulta_bd($query)
 	if(mysqli_con) {
 		$con = conectar();
 		$result = $con->query($query);
-		$result->fetch_all(MYSQLI_ASSOC);
+		$result->fetch_array(MYSQLI_ASSOC);
+		fechar_conexao($con);
+
+		return $result;
+	}
+}
+
+function registra_bd($query)
+{
+	if(mysqli_con) {
+		$con = conectar();
+		$result = $con->query($query);
+		$id = mysqli_insert_id($con);
+		fechar_conexao($con);
+
+		return $id;
+	}
+}
+
+function atualiza_bd($query)
+{
+	if(mysqli_con) {
+		$con = conectar();
+		$result = $con->query($query);
+		fechar_conexao($con);
+
+		return $result;
+	}
+}
+
+function consulta_registro_bd($query)
+{
+	if(mysqli_con) {
+		$con = conectar();
+		$result = $con->query($query);
+		$result->fetch_row();
 		fechar_conexao($con);
 
 		return $result;
