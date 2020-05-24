@@ -4,13 +4,10 @@
 	$operacao = isset($_GET["op"]) ? $_GET["op"] : "";
 	$id = isset($_GET["id"]) ? $_GET["id"] : "";
 
-	if(
-		!isset($id) || !isset($operacao) || !is_numeric($id) 
-		|| empty($id) || empty($operacao)
-	) {
+	if (!isset($operacao) || ($operacao == "editar" && !is_numeric($id)) ) {
 		echo 
 		"
-			<h1>Erro</h1>
+			<h1>Erro - $operacao</h1>
 			<p>Registro não encontrado, clique <a href='./index.php'>aqui para voltar</a></p>
 		";
 		exit();
@@ -31,6 +28,12 @@
 			$update_sql = "UPDATE cliente SET nome='$form_nome', cpf='$form_cpf', email='$form_email' WHERE id_cliente='$form_id';";
 
 			$update = atualiza_bd($update_sql);
+		}
+
+		if($form_tipo_op == "cadastrar") {
+			$update_sql = "INSERT INTO `crud_php_puro`.`cliente` (`nome`, `cpf`, `email`) VALUES ('$form_nome', '$form_cpf', '$form_email');";
+
+			$insert = registra_bd($update_sql);
 		}
 
 		header('Location: ./index.php');

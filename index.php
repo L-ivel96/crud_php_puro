@@ -51,7 +51,7 @@
 	        </tbody>
 	        <tfoot>
 	            <tr>
-	                <td colspan="4"><a href="./pagina_cadastrar" class="btn btn-info">Adicionar Cliente</a></td>
+	                <td colspan="4"><a href="./pagina_editar?op=cadastrar" class="btn btn-info">Adicionar Cliente</a></td>
 	            </tr>
 	        </tfoot>
 	    </table>
