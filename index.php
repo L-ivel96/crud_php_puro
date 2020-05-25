@@ -32,8 +32,13 @@
 	        <thead class="thead-dark">
 	            <tr>
 	                <th>Nome</th>
-	                <th>CPF</th>
-	                <th>E-mail</th>
+	                <th>CPF/CNPJ</th>
+	                <th>Idade</th>
+	                <th>Enderço</th>
+	                <th>Descrição</th>
+	                <th>Valor</th>
+	                <th>Vencimento</th>
+	                <th>Atualizado em</th>
 	                <th>Editar</th>
 	                <th>Deletar</th>
 	            </tr>
@@ -44,10 +49,22 @@
 	        		$clientes = consulta_bd($consulta);
 	        	?>
 	        	<?php foreach ($clientes as $cliente): ?>
+	        	<?php
+	        		//tratamento de dados
+		        	$nascimento = new DateTime($cliente["nascimento"]);
+		        	$idade = $nascimento->diff(new DateTime());
+	        		$atualizado_em = new DateTime($cliente["atualizado_em"]);
+        			$valor_br = "R$".number_format($cliente["valor"],2,",",".");
+	        	?>
 	        	<tr>
 	        		<td><?= $cliente["nome"]; ?></td>
-	        		<td><?= $cliente["cpf"]; ?></td>
-	        		<td><?= $cliente["email"]; ?></td>
+	        		<td><?= formatCnpjCpf($cliente["cpf_cnpj"]); ?></td>
+	        		<td><?= $idade->y; ?></td>
+	        		<td><?= $cliente["endereco"]; ?></td>
+	        		<td><?= $cliente["desc_titulo"]; ?></td>
+	        		<td><?= $valor_br; ?></td>
+	        		<td><?= $cliente["vencimento"]; ?></td>
+	        		<td><?= $atualizado_em->format('d/m/Y h:i:s'); ?></td>
 	        		<td>
 	        			<a class="btn btn-warning" href="./pagina_editar?op=editar&id=<?= $cliente['id_cliente'] ?>">Editar</a>
 	        		</td>
@@ -59,7 +76,7 @@
 	        </tbody>
 	        <tfoot>
 	            <tr>
-	                <td colspan="4"><a href="./pagina_editar?op=cadastrar" class="btn btn-info">Adicionar Cliente</a></td>
+	                <td colspan="10"><a href="./pagina_editar?op=cadastrar" class="btn btn-info">Adicionar Cliente</a></td>
 	            </tr>
 	        </tfoot>
 	    </table>
