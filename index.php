@@ -41,7 +41,7 @@
 	
 	$clientes = consulta_bd($consulta);
 
-	$total_devedores = mysqli_con ? $dados->num_rows : sizeof($clientes);
+	$total_devedores = mysqli_con ? $clientes->num_rows : sizeof($clientes);
 	$total_divida = 0;
 	$total_vencidos = 0;
 
