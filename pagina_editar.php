@@ -20,21 +20,35 @@
 
 		$form_tipo_op = $_POST["tipo_op"];
 		$form_id = $_POST["id"];
+		$formatacao_cpf = array('.','-', '/');
+		$dt_atual = new DateTime();
+
 		if (mysqli_con){
 			$form_nome = $con->real_escape_string($_POST["nome"]);
-			$form_cpf = $con->real_escape_string($_POST["cpf"]);
-			$form_email = $con->real_escape_string($_POST["email"]);
+			$form_cpf = $con->real_escape_string(str_replace($formatacao_cpf,'', $_POST["cpf"]));
+			$form_nascimento = $con->real_escape_string($_POST["nascimento"]);
+			$form_endereco = $con->real_escape_string($_POST["endereco"]);
+			$form_descricao = $con->real_escape_string($_POST["descricao"]);
+			$form_valor = $con->real_escape_string($_POST["valor"]);
+			$form_vencimento = $con->real_escape_string($_POST["vencimento"]);
 
 			$update_sql = "";
 
 			if($form_tipo_op == "editar") {
-				$update_sql = "UPDATE cliente SET nome='$form_nome', cpf='$form_cpf', email='$form_email' WHERE id_cliente='$form_id';";
+				$update_sql = "
+					UPDATE cliente 
+					SET nome = '$form_nome' , cpf_cnpj = '$form_cpf' ,
+					nascimento = '$form_nascimento' , endereco = '$form_endereco' ,
+					desc_titulo = '$form_descricao' , valor = '$form_valor' ,
+					vencimento = '$form_vencimento', atualizado_em = '{$dt_atual->format('Y-m-d h:i')}'
+					WHERE id_cliente = $form_id;
+				";
 
 				$update = atualiza_bd($update_sql);
 			}
 
 			if($form_tipo_op == "cadastrar") {
-				$update_sql = "INSERT INTO `crud_php_puro`.`cliente` (`nome`, `cpf`, `email`) VALUES ('$form_nome', '$form_cpf', '$form_email');";
+				$update_sql = "INSERT INTO `crud_php_puro`.`cliente` (`nome`, `cpf_cnpj`, `nascimento`, `endereco`, `desc_titulo`, `valor`, `vencimento`, `criado_em`, `atualizado_em`) VALUES ('$form_nome', '$form_cpf', '$form_nascimento', '$form_endereco', '$form_descricao', '$form_valor', '$form_vencimento', '{$dt_atual->format('Y-m-d h:i')}', '{$dt_atual->format('Y-m-d h:i')}');";
 
 				$insert = registra_bd($update_sql);
 			}
@@ -42,17 +56,31 @@
 		else
 		{
 			$form_nome = $_POST["nome"];
-			$form_cpf = $_POST["cpf"];
-			$form_email = $_POST["email"];
+			$form_cpf = str_replace($formatacao_cpf,'', $_POST["cpf"]);
+			$form_nascimento = $_POST["nascimento"];
+			$form_endereco = $_POST["endereco"];
+			$form_descricao = $_POST["descricao"];
+			$form_valor = $_POST["valor"];
+			$form_vencimento = $_POST["vencimento"];
 
 			$update_sql = "";
 
 			if($form_tipo_op == "editar") {
-				$update_sql = "UPDATE cliente SET nome= ? , cpf= ? , email= ?  WHERE id_cliente= ? ;";
+				$update_sql = "
+					UPDATE cliente 
+					SET nome = ? , cpf_cnpj = ? , nascimento = ? , endereco = ? ,
+					desc_titulo = ? , valor = ? , vencimento = ?, atualizado_em = ?
+					WHERE id_cliente = ? ;
+				";
 				$dados_up = array(
 					$form_nome,
 					$form_cpf,
-					$form_email,
+					$form_nascimento,
+					$form_endereco,
+					$form_descricao,
+					$form_valor,
+					$form_vencimento,
+					$atualizado_em->format('Y-m-d h:i'),
 					$form_id
 				);
 
@@ -60,12 +88,18 @@
 			}
 
 			if($form_tipo_op == "cadastrar") {
-				$update_sql = "INSERT INTO `crud_php_puro`.`cliente` (`nome`, `cpf`, `email`) VALUES (?, ?, ?);";
+				$update_sql = "INSERT INTO `crud_php_puro`.`cliente` (`nome`, `cpf_cnpj`, `nascimento`, `endereco`, `desc_titulo`, `valor`, `vencimento`, `criado_em`, `atualizado_em`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
 				$dados_in = array(
 					$form_nome,
 					$form_cpf,
-					$form_email
+					$form_nascimento,
+					$form_endereco,
+					$form_descricao,
+					$form_valor,
+					$form_vencimento,
+					$dt_atual->format('Y-m-d h:i'),
+					$dt_atual->format('Y-m-d h:i')
 				);
 
 				$insert = registra_bd($update_sql, $dados_in);
@@ -83,7 +117,11 @@
 
 	$campo_nome = "";
 	$campo_cpf = "";
-	$campo_email = "";
+	$campo_nascimento = "";
+	$campo_endereco = "";
+	$campo_descricao = "";
+	$campo_valor = "";
+	$campo_vencimento = "";
 
 	$dados = consulta_registro_bd($registro_sql);
 
@@ -100,8 +138,12 @@
 
 	foreach ($dados as $registro) {
 		$campo_nome = $registro["nome"] ? $registro["nome"] : "";
-		$campo_cpf = $registro["cpf"] ? $registro["cpf"] : "";
-		$campo_email = $registro["email"] ? $registro["email"] : "";
+		$campo_cpf = $registro["cpf_cnpj"] ? formatCnpjCpf($registro["cpf_cnpj"]) : "";
+		$campo_nascimento = $registro["nascimento"] ? $registro["nascimento"] : "";
+		$campo_endereco = $registro["endereco"] ? $registro["endereco"] : "";
+		$campo_descricao = $registro["desc_titulo"] ? $registro["desc_titulo"] : "";
+		$campo_valor = $registro["valor"] ? number_format($registro["valor"],2,",","") : "";
+		$campo_vencimento = $registro["vencimento"] ? $registro["vencimento"] : "";
 	}
 	
 ?>
@@ -131,12 +173,28 @@
 	            <input type="text" class="form-control" name="nome" id="nome" aria-describedby="Nome do cliente" placeholder="Nome do Cliente" required="required" value="<?= $campo_nome ?>">
 	        </div>
 	        <div class="form-group">
-	            <label for="cpf">CPF</label>
+	            <label for="cpf">CPF/CNPJ</label>
 	            <input type="text" class="form-control" name="cpf" id="cpf" aria-describedby="cpf do cliente" placeholder="CPF do Cliente" required="required" value="<?= $campo_cpf ?>">
 	        </div>
 	        <div class="form-group">
-	            <label for="email">E-mail</label>
-	            <input type="text" class="form-control" name="email" id="email" aria-describedby="E-mail" placeholder="E-mail" required="required" value="<?= $campo_email ?>">
+	            <label for="nascimento">Data de nascimento</label>
+	            <input type="date" class="form-control" name="nascimento" id="nascimento" aria-describedby="data de nascimento do cliente" required="required" value="<?= $campo_nascimento ?>">
+	        </div>
+	        <div class="form-group">
+	            <label for="endereco">Endereço</label>
+	            <input type="text" class="form-control" name="endereco" id="endereco" aria-describedby="Endereço" placeholder="Endereço" required="required" value="<?= $campo_endereco ?>">
+	        </div>
+	        <div class="form-group">
+	            <label for="descricao">Descrição</label>
+	            <input type="text" class="form-control" name="descricao" id="descricao" aria-describedby="Descrição" placeholder="Descrição" required="required" value="<?= $campo_descricao ?>">
+	        </div>
+	        <div class="form-group">
+	            <label for="valor">Valor (R$)</label>
+	            <input type="number" step="any" class="form-control" name="valor" id="valor" aria-describedby="valor da dívida" placeholder="Valor da dívida" required="required" value="<?= $campo_valor ?>">
+	        </div>
+	        <div class="form-group">
+	            <label for="vencimento">Vencimento</label>
+	            <input type="date" class="form-control" name="vencimento" id="vencimento" aria-describedby="vencimento" required="required" value="<?= $campo_vencimento ?>">
 	        </div>
 	        <div class="form-group">
 	            <input type="submit" class="btn btn-primary text-capitalize" id="editar" value="<?= $operacao ?>" />
