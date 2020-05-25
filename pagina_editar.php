@@ -20,7 +20,7 @@
 
 		$form_tipo_op = $_POST["tipo_op"];
 		$form_id = $_POST["id"];
-		$formatacao_cpf = array('.','-', '/');
+		
 		$dt_atual = new DateTime();
 
 		if (mysqli_con){
@@ -80,7 +80,7 @@
 					$form_descricao,
 					$form_valor,
 					$form_vencimento,
-					$atualizado_em->format('Y-m-d h:i'),
+					$dt_atual->format('Y-m-d h:i'),
 					$form_id
 				);
 

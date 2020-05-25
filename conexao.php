@@ -138,6 +138,8 @@ function consulta_registro_bd($query)
 	}
 }
 
+$formatacao_cpf = array('.','-', '/');
+
 function formatCnpjCpf($value)
 {
 	$cnpj_cpf = preg_replace("/\D/", '', $value);
