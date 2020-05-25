@@ -77,7 +77,7 @@ function consulta_registro_bd($query)
 }
 
 
-/* Cria bd
+/* Cria Banco de dados
 
 CREATE SCHEMA `crud_php_puro` DEFAULT CHARACTER SET utf8 ;
 CREATE TABLE `crud_php_puro`.`cliente` (

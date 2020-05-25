@@ -5,8 +5,7 @@
 	$id = isset($_GET["id"]) ? $_GET["id"] : "";
 
 	if ($operacao == "excluir" && !empty($id)) {
-		$deletar_sql = "DELETE FROM cliente WHERE id_cliente='$id';
-";
+		$deletar_sql = "DELETE FROM cliente WHERE id_cliente='$id'; ";
 		$deletar = atualiza_bd($deletar_sql);
 	}
 

@@ -16,11 +16,13 @@
 	//Identifica metodo POST
 	if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
+		$con = conectar();
+
 		$form_tipo_op = $_POST["tipo_op"];
 		$form_id = $_POST["id"];
-		$form_nome = $_POST["nome"];
-		$form_cpf = $_POST["cpf"];
-		$form_email = $_POST["email"];
+		$form_nome = $con->real_escape_string($_POST["nome"]);
+		$form_cpf = $con->real_escape_string($_POST["cpf"]);
+		$form_email = $con->real_escape_string($_POST["email"]);
 
 		$update_sql = "";
 
@@ -31,7 +33,7 @@
 		}
 
 		if($form_tipo_op == "cadastrar") {
-			$update_sql = "INSERT INTO `crud_php_puro`.`cliente` (`nome`, `cpf`, `email`) VALUES ('$form_nome', '$form_cpf', '$form_email');";
+			$update_sql = "INSERT INTO `crud_php_puro`.`cliente` (`nome`, `cpf`, `email`) VALUES (`$form_nome, '$form_cpf', '$form_email');";
 
 			$insert = registra_bd($update_sql);
 		}
