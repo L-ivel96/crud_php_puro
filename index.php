@@ -9,6 +9,54 @@
 		$deletar = atualiza_bd($deletar_sql);
 	}
 
+	$consulta = "SELECT * FROM cliente";
+	$busca_nome_cpf = isset($_GET["busca_nome_cpf"]) ? $_GET["busca_nome_cpf"] : "";
+	$ordenar_por = isset($_GET["ordenar_por"]) ? $_GET["ordenar_por"] : "";
+
+	$busca_ordenacao = array(
+		"nome_asc" =>"Nome (A-Z)",
+		"nome_desc" =>"Nome (Z-A)",
+		"valor_asc" =>"Valor (crescente)",
+		"valor_desc" =>"Valor (decrescente)",
+		"vencimento_asc" =>"Vencimento (crescente)",
+		"vencimento_desc" =>"Vencimento (decrescente)"
+	);
+	
+	if ( 
+		(isset($_GET["busca_nome_cpf"]) && !empty($_GET["busca_nome_cpf"]) ) 
+		|| (isset($_GET["ordenar_por"]) && !empty($_GET["ordenar_por"]) )
+	) {
+
+		if (isset($_GET["busca_nome_cpf"]) && !empty($_GET["busca_nome_cpf"])) {
+			$valor_busca = $_GET["busca_nome_cpf"];
+			$consulta .= " WHERE nome like '%$valor_busca%' or cpf_cnpj like '%$valor_busca%'";
+		}
+
+		if (isset($_GET["ordenar_por"]) && !empty($_GET["ordenar_por"])) {
+			$ordem = explode('_', $_GET["ordenar_por"]);
+			$consulta .= " ORDER BY ".$ordem[0]." ".$ordem[1]." ";
+
+		}
+	}
+	
+	$clientes = consulta_bd($consulta);
+
+	$total_devedores = mysqli_con ? $clientes->num_rows : sizeof($clientes);
+	$total_divida = 0;
+	$total_vencidos = 0;
+
+	$dt_atual = new DateTime();
+
+	foreach ($clientes as $cliente) {
+		$total_divida += $cliente["valor"];
+		$dt_vencimento = new DateTime($cliente["vencimento"]);
+
+		if ($dt_vencimento < $dt_atual) {
+			$total_vencidos += 1;
+		}
+
+	}
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -28,7 +76,56 @@
     </nav>
     <div class="container">
 
-	    <table id="tabela_clientes" class="table table-striped table-bordered">
+    	<div class="d-flex justify-content-center">
+	    	<div class="col-md-4">
+		    	<table id="tabela_clientes" class="table table-striped table-bordered mb-5">
+			        <thead class="thead-dark">
+			            <tr>
+			                <th>Análise</th>
+			                <th>Dados</th>
+			            </tr>
+			        </thead>
+			        <tbody>
+			        	<tr>
+			        		<td>Total de devedores</td>
+			        		<td><?= $total_devedores; ?></td>
+			        	</tr>
+			        	<tr>
+			        		<td>Total da dívida</td>
+			        		<td><?= "R$".number_format($total_divida,2,",","."); ?></td>
+			        	</tr>
+			        	<tr>
+			        		<td>Total de vencidos</td>
+			        		<td><?= $total_vencidos; ?></td>
+			        	</tr>
+			        </tbody>
+			    </table>
+			</div>
+		</div>
+
+		<div class="mb-2 col-md-7">
+			<form class="form-inline" method="GET">
+				<div class="mr-2 mb-2">
+					<input type="text" class="form-control" name="busca_nome_cpf" placeholder="Buscar nome ou CPF/CNPJ" value="<?= $busca_nome_cpf; ?>">
+				</div>
+				<div class="mr-2 mb-2">
+					<select class="form-control" name="ordenar_por">
+						<option value="" <?= $ordenar_por ? "" : 'selected'; ?>  >Ordenar por:</option>
+						<?php foreach ($busca_ordenacao as $key => $value) : ?>
+
+							<option value="<?= $key; ?>" <?= $ordenar_por == $key ? 'selected=""' : ""; ?> ><?= $value; ?></option>
+						<?php endforeach ?>
+						
+					</select>
+				</div>
+				<div>
+					<input type="submit" class="btn btn-primary mb-2" value="Pesquisar" />
+				</div>
+
+			</form>
+		</div>
+
+	    <table id="tabela_clientes" class="table table-striped table-bordered table-responsive">
 	        <thead class="thead-dark">
 	            <tr>
 	                <th>Nome</th>
@@ -44,10 +141,6 @@
 	            </tr>
 	        </thead>
 	        <tbody>
-	        	<?php 
-	        		$consulta = "SELECT * FROM cliente";
-	        		$clientes = consulta_bd($consulta);
-	        	?>
 	        	<?php foreach ($clientes as $cliente): ?>
 	        	<?php
 	        		//tratamento de dados
