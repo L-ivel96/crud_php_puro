@@ -5,7 +5,9 @@ define('bd_usuario', 'root');
 define('bd_senha', '');
 define('bd_nome', 'crud_php_puro');
 
-define('mysqli_con', true);
+define('bd_dsn', 'mysql:host=localhost;charset=utf8;dbname='.bd_nome);
+
+define('mysqli_con', false);
 
 function conectar()
 {
@@ -19,6 +21,17 @@ function conectar()
 		}
 
 		return $conexao;
+	}
+	else {
+		try {
+			$conexao = new PDO(bd_dsn, bd_usuario, bd_senha);
+
+			return $conexao;
+		}
+		catch(PDOException $e) {
+			echo "Erro de conexão: ". $e->getMessage();
+		}
+		
 	}
 }
 
@@ -39,9 +52,18 @@ function consulta_bd($query)
 
 		return $result;
 	}
+	else {
+		$con = conectar();
+		$busca = $con->prepare($query);
+		$busca->execute();
+		$result = $busca->fetchAll();
+
+		return $result;
+
+	}
 }
 
-function registra_bd($query)
+function registra_bd($query, $dados = null)
 {
 	if(mysqli_con) {
 		$con = conectar();
@@ -51,9 +73,22 @@ function registra_bd($query)
 
 		return $id;
 	}
+	else {
+		$con = conectar();
+		$busca = $con->prepare($query);
+		$j = 0;
+		if (!is_null($dados)) {
+			for ($i=1; $i <= sizeof($dados); $i++) { 
+				$busca->bindParam($i, $dados[$j]);
+				$j++;
+			}
+		}
+
+		return  $busca->execute();
+	}
 }
 
-function atualiza_bd($query)
+function atualiza_bd($query, $dados = null)
 {
 	if(mysqli_con) {
 		$con = conectar();
@@ -61,6 +96,19 @@ function atualiza_bd($query)
 		fechar_conexao($con);
 
 		return $result;
+	}
+	else {
+		$con = conectar();
+		$busca = $con->prepare($query);
+		$j = 0;
+		if (!is_null($dados)) {
+			for ($i=1; $i <= sizeof($dados); $i++) { 
+				$busca->bindParam($i, $dados[$j]);
+				$j++;
+			}
+		}
+
+		return  $busca->execute();
 	}
 }
 
@@ -71,6 +119,14 @@ function consulta_registro_bd($query)
 		$result = $con->query($query);
 		$result->fetch_row();
 		fechar_conexao($con);
+
+		return $result;
+	}
+	else {
+		$con = conectar();
+		$busca = $con->prepare($query);
+		$busca->execute();
+		$result = $busca->fetchAll();
 
 		return $result;
 	}

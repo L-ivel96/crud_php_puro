@@ -4,7 +4,7 @@
 	$operacao = isset($_GET["op"]) ? $_GET["op"] : "";
 	$id = isset($_GET["id"]) ? $_GET["id"] : "";
 
-	if ($operacao == "excluir" && !empty($id)) {
+	if ($operacao == "excluir" && !empty($id) && is_numeric($id)) {
 		$deletar_sql = "DELETE FROM cliente WHERE id_cliente='$id'; ";
 		$deletar = atualiza_bd($deletar_sql);
 	}

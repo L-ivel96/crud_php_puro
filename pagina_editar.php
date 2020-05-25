@@ -20,23 +20,58 @@
 
 		$form_tipo_op = $_POST["tipo_op"];
 		$form_id = $_POST["id"];
-		$form_nome = $con->real_escape_string($_POST["nome"]);
-		$form_cpf = $con->real_escape_string($_POST["cpf"]);
-		$form_email = $con->real_escape_string($_POST["email"]);
+		if (mysqli_con){
+			$form_nome = $con->real_escape_string($_POST["nome"]);
+			$form_cpf = $con->real_escape_string($_POST["cpf"]);
+			$form_email = $con->real_escape_string($_POST["email"]);
 
-		$update_sql = "";
+			$update_sql = "";
 
-		if($form_tipo_op == "editar") {
-			$update_sql = "UPDATE cliente SET nome='$form_nome', cpf='$form_cpf', email='$form_email' WHERE id_cliente='$form_id';";
+			if($form_tipo_op == "editar") {
+				$update_sql = "UPDATE cliente SET nome='$form_nome', cpf='$form_cpf', email='$form_email' WHERE id_cliente='$form_id';";
 
-			$update = atualiza_bd($update_sql);
+				$update = atualiza_bd($update_sql);
+			}
+
+			if($form_tipo_op == "cadastrar") {
+				$update_sql = "INSERT INTO `crud_php_puro`.`cliente` (`nome`, `cpf`, `email`) VALUES ('$form_nome', '$form_cpf', '$form_email');";
+
+				$insert = registra_bd($update_sql);
+			}
 		}
+		else
+		{
+			$form_nome = $_POST["nome"];
+			$form_cpf = $_POST["cpf"];
+			$form_email = $_POST["email"];
 
-		if($form_tipo_op == "cadastrar") {
-			$update_sql = "INSERT INTO `crud_php_puro`.`cliente` (`nome`, `cpf`, `email`) VALUES (`$form_nome, '$form_cpf', '$form_email');";
+			$update_sql = "";
 
-			$insert = registra_bd($update_sql);
+			if($form_tipo_op == "editar") {
+				$update_sql = "UPDATE cliente SET nome= ? , cpf= ? , email= ?  WHERE id_cliente= ? ;";
+				$dados_up = array(
+					$form_nome,
+					$form_cpf,
+					$form_email,
+					$form_id
+				);
+
+				$update = atualiza_bd($update_sql, $dados_up);
+			}
+
+			if($form_tipo_op == "cadastrar") {
+				$update_sql = "INSERT INTO `crud_php_puro`.`cliente` (`nome`, `cpf`, `email`) VALUES (?, ?, ?);";
+
+				$dados_in = array(
+					$form_nome,
+					$form_cpf,
+					$form_email
+				);
+
+				$insert = registra_bd($update_sql, $dados_in);
+			}
 		}
+		
 
 		header('Location: ./index.php');
 		exit();
@@ -52,7 +87,9 @@
 
 	$dados = consulta_registro_bd($registro_sql);
 
-	if($dados->num_rows === 0 && $operacao == "editar") {
+	$num_row = mysqli_con ? $dados->num_rows : sizeof($dados);
+
+	if($num_row === 0 && $operacao == "editar") {
 		echo 
 		"
 			<h1>Erro</h1>
@@ -82,7 +119,7 @@
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-light mb-2 d-flex" style="background-color: #e9ecef;">
-        <h2>CRUD Clientes - Editar</h2>
+        <h2>CRUD Clientes - <?= $operacao ?></h2>
     </nav>
     <div class="container">
 
@@ -103,6 +140,7 @@
 	        </div>
 	        <div class="form-group">
 	            <input type="submit" class="btn btn-primary text-capitalize" id="editar" value="<?= $operacao ?>" />
+	            <a href="./" class="btn btn-primary text-capitalize ml-4">Voltar</a>
 	        </div>
 	    </form>
 	</div>
